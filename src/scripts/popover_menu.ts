@@ -21,6 +21,7 @@ function popoverMenuDirective(): ng.IDirective {
             const button = (<JQuery>(<any>transclude)(scope, null, null, 'button'))
                 .attr('aria-haspopup', 'true')
                 .on('click', toggle)
+                .on('keydown', onKeyDown)
                 .appendTo(element);
             const buttonElement = <HTMLButtonElement>button[0];
             const buttonId = buttonElement.id = id + '__button';
@@ -40,6 +41,7 @@ function popoverMenuDirective(): ng.IDirective {
                 list = (<JQuery>(<any>transclude)(scope, null, null, 'list'))
                     .addClass('popover-menu__list')
                     .attr('aria-labelledby', buttonId)
+                    .on('keydown', onKeyDown)
                     .appendTo(element);
 
                 element.addClass(OPEN_MODIFIER);
@@ -54,6 +56,49 @@ function popoverMenuDirective(): ng.IDirective {
 
                 element.removeClass(OPEN_MODIFIER);
                 button.attr(EXPANDED_ATTRIBUTE, 'false');
+            }
+
+            function onKeyDown(e: JQueryKeyEventObject): void {
+                if (e.isDefaultPrevented()) {
+                    return;
+                }
+
+                switch (e.key) {
+                    case 'Escape':
+                        button.trigger('focus');
+                        close();
+                        break;
+                    case 'ArrowUp':
+                        shiftFocus(-1);
+                        break;
+                    case 'ArrowDown':
+                        shiftFocus(1);
+                        break;
+                    default:
+                        return;
+                }
+
+                e.preventDefault();
+
+                function shiftFocus(shift: number): void {
+                    if (list) {
+                        const items = list.find('a');
+
+                        const maxIndex = items.length - 1;
+
+                        let index = items.index(e.target) + shift;
+
+                        if (index < 0) {
+                            index = maxIndex;
+                        } else if (index > maxIndex) {
+                            index = 0;
+                        }
+
+                        items.eq(index).trigger('focus');
+                    } else {
+                        open();
+                    }
+                }
             }
         },
     };
