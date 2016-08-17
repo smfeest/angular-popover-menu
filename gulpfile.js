@@ -7,6 +7,7 @@ const less = require('gulp-less');
 const source = require('vinyl-source-stream');
 const sourcemaps = require('gulp-sourcemaps');
 const tsify = require('tsify');
+const tslint = require('gulp-tslint');
 const watchify = require('watchify');
 const watchLess = require('gulp-watch-less');
 
@@ -25,7 +26,7 @@ const tsArgs = {
 
 gulp.task('default', ['build']);
 
-gulp.task('build', ['libs', 'scripts', 'styles']);
+gulp.task('build', ['libs', 'lint', 'scripts', 'styles']);
 
 gulp.task('libs', () => gulp.src([
     config.bowerPath + '/jquery/dist/jquery.js',
@@ -35,6 +36,12 @@ gulp.task('libs', () => gulp.src([
     .pipe(concat('lib.js'))
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest(config.jsPath)));
+
+gulp.task('lint', () => gulp.src(config.tsPath + '/**/*.ts')
+    .pipe(tslint({
+        formatter: "verbose"
+    }))
+    .pipe(tslint.report()));
 
 gulp.task('scripts',
     () => bundleScripts(createBundler().plugin(tsify, tsArgs)));
