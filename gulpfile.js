@@ -30,7 +30,7 @@ gulp.task('build', ['libs', 'scripts', 'styles']);
 gulp.task('libs', () => gulp.src([
     config.bowerPath + '/jquery/dist/jquery.js',
     config.bowerPath + '/angular/angular.js',
-    config.bowerPath + '/angular-route/angular-route.js'], { base: config.bowerPath })
+], { base: config.bowerPath })
     .pipe(sourcemaps.init())
     .pipe(concat('lib.js'))
     .pipe(sourcemaps.write('./'))

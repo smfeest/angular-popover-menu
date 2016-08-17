@@ -1,6 +1,6 @@
-# Angular TypeScript Seed
+# Angular popover menu
 
-A very basic seed project for Angular 1 applications written in TypeScript.
+Angular module for popover menus.
 
 ## Getting started
 
@@ -19,25 +19,6 @@ A very basic seed project for Angular 1 applications written in TypeScript.
 ### Watching for changes to LESS and TypeScript files
 
     gulp watch
-
-## What's included
-
-- Basic development server
-- Angular application stub with routing
-- LESS stylesheet stub with
-  [Normalize.css](https://necolas.github.io/normalize.css/)
-- [Gulp.js](http://gulpjs.com/) tasks to:
-  - Watch and compile TypeScript source files (with ES6 modules) into the
-    public scripts directory
-  - Watch and compile LESS source files (with auto-prefixing) into the public
-    styles directory
-  - Concatenate third party scripts into a single file in the public scripts
-    directory
-
-## What's excluded
-
-- Minification
-- Cache busting
 
 ## Project structure
 
