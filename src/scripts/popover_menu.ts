@@ -1,4 +1,6 @@
-angular.module('sfPopoverMenu', []).directive('sfPopoverMenu', popoverMenuDirective);
+angular.module('sfPopoverMenu', [])
+    .directive('sfPopoverMenu', popoverMenuDirective)
+    .directive('sfPopoverMenuSeparator', popoverMenuSeparatorDirective);
 
 function popoverMenuDirective($document: ng.IDocumentService): ng.IDirective {
     let counter = 0;
@@ -133,6 +135,14 @@ function popoverMenuDirective($document: ng.IDocumentService): ng.IDirective {
                     }
                 }
             }
+        },
+    };
+}
+
+function popoverMenuSeparatorDirective(): ng.IDirective {
+    return {
+        link: (scope, element) => {
+            element.addClass('popover-menu__separator').attr('role', 'separator');
         },
     };
 }
