@@ -1,6 +1,6 @@
 angular.module('sfPopoverMenu', []).directive('sfPopoverMenu', popoverMenuDirective);
 
-function popoverMenuDirective(): ng.IDirective {
+function popoverMenuDirective($document: ng.IDocumentService): ng.IDirective {
     let counter = 0;
 
     return {
@@ -38,24 +38,36 @@ function popoverMenuDirective(): ng.IDirective {
             }
 
             function open(): void {
-                list = (<JQuery>(<any>transclude)(scope, null, null, 'list'))
-                    .addClass('popover-menu__list')
-                    .attr('aria-labelledby', buttonId)
-                    .on('keydown', onKeyDown)
-                    .appendTo(element);
+                if (!list) {
+                    list = (<JQuery>(<any>transclude)(scope, null, null, 'list'))
+                        .addClass('popover-menu__list')
+                        .attr('aria-labelledby', buttonId)
+                        .on('keydown', onKeyDown)
+                        .appendTo(element);
 
-                element.addClass(OPEN_MODIFIER);
-                button.attr(EXPANDED_ATTRIBUTE, 'true');
+                    element.addClass(OPEN_MODIFIER);
+                    button.attr(EXPANDED_ATTRIBUTE, 'true');
+
+                    $document.on('click', onDocumentClick);
+                }
             }
 
             function close(): void {
                 if (list) {
+                    $document.off('click', onDocumentClick);
+
                     list.remove();
                     list = null;
                 }
 
                 element.removeClass(OPEN_MODIFIER);
                 button.attr(EXPANDED_ATTRIBUTE, 'false');
+            }
+
+            function onDocumentClick(e: JQueryEventObject): void {
+                if (!(e.isDefaultPrevented() || element[0].contains(e.target))) {
+                    close();
+                }
             }
 
             function onKeyDown(e: JQueryKeyEventObject): void {
@@ -103,3 +115,5 @@ function popoverMenuDirective(): ng.IDirective {
         },
     };
 }
+
+popoverMenuDirective.$inject = ['$document'];
