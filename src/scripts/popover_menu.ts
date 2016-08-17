@@ -29,6 +29,8 @@ function popoverMenuDirective($document: ng.IDocumentService): ng.IDirective {
 
             close();
 
+            element.on('$destroy', close);
+
             function toggle(): void {
                 if (list) {
                     close();
