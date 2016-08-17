@@ -10,9 +10,14 @@ function popoverMenuDirective($document: ng.IDocumentService): ng.IDirective {
         },
         link: (scope, element, attrs, ctrl, transclude) => {
             const OPEN_MODIFIER = 'popover-menu--open';
+            const CONFIG_ATTRIBUTE = 'sfPopoverMenu';
             const EXPANDED_ATTRIBUTE = 'aria-expanded';
 
             let list: ng.IAugmentedJQuery;
+            let tether: Tether;
+
+            const config: IPopoverMenuConfig = attrs[CONFIG_ATTRIBUTE] &&
+                scope.$eval(attrs[CONFIG_ATTRIBUTE]);
 
             const id = element[0].id = (element[0].id || ('popover-menu-' + counter++));
 
@@ -47,6 +52,17 @@ function popoverMenuDirective($document: ng.IDocumentService): ng.IDirective {
                         .on('keydown', onKeyDown)
                         .appendTo(element);
 
+                    tether = new Tether({
+                        element: list,
+                        attachment: (config && config.popoverAttachment) || 'top left',
+                        target: button,
+                        targetAttachment: (config && config.buttonAttachment) || 'bottom left',
+                        constraints: [{
+                            to: 'window',
+                            attachment: 'together',
+                        }],
+                    });
+
                     element.addClass(OPEN_MODIFIER);
                     button.attr(EXPANDED_ATTRIBUTE, 'true');
 
@@ -57,6 +73,9 @@ function popoverMenuDirective($document: ng.IDocumentService): ng.IDirective {
             function close(): void {
                 if (list) {
                     $document.off('click', onDocumentClick);
+
+                    tether.destroy();
+                    tether = null;
 
                     list.remove();
                     list = null;
@@ -116,6 +135,30 @@ function popoverMenuDirective($document: ng.IDocumentService): ng.IDirective {
             }
         },
     };
+}
+
+interface IPopoverMenuConfig {
+    /**
+     * The button's attachment point
+     *
+     * If specified, this property should be in the form
+     * '{vertical-attachment} {horizontal-attachment}' where `{vertical-attachment}` is 'top',
+     * 'middle' or 'bottom' and `{horizontal-attachment}` is 'left', 'center' or 'right'.
+     *
+     * If unspecified, 'bottom left' is assumed.
+     */
+    buttonAttachment?: string;
+
+    /**
+     * The popover's attachment point
+     *
+     * If specified, this property should be in the form
+     * '{vertical-attachment} {horizontal-attachment}' where `{vertical-attachment}` is 'top',
+     * 'middle' or 'bottom' and `{horizontal-attachment}` is 'left', 'center' or 'right'.
+     *
+     * If unspecified, 'top left' is assumed.
+     */
+    popoverAttachment?: string;
 }
 
 popoverMenuDirective.$inject = ['$document'];
