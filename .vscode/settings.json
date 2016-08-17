@@ -1,0 +1,11 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+    "editor.detectIndentation": false,
+    "editor.rulers": [
+        100
+    ],
+    "editor.tabSize": 4,
+    "files.autoSave": "onFocusChange",
+    "files.trimTrailingWhitespace": true,
+    "html.format.endWithNewline": true
+}
