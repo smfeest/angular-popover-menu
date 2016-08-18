@@ -117,7 +117,8 @@ class PopoverMenuController implements ng.IComponentController, IPopoverMenuCont
     private tether: Tether;
 
     private documentClickHandler = (e: JQueryEventObject): void => {
-        if (!(e.isDefaultPrevented() || this.element[0].contains(e.target))) {
+        if (!e.isDefaultPrevented() && (!this.element[0].contains(e.target) ||
+            jQuery(e.target).is('li > a'))) {
             this.close();
             this.scope.$apply();
         }
