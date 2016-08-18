@@ -1,0 +1,18 @@
+<div sf-popover-menu class="demo__popover-menu" ng-if="demoCtrl.visible">
+    <button>{{demoCtrl.caption}}</button>
+    <ul>
+        <li sf-popover-menu-separator></li>
+        <li><a href="#">Red</a></li>
+        <li sf-popover-menu-separator></li>
+        <li><a href="#">Yellow</a></li>
+        <li sf-popover-menu-separator></li>
+        <li sf-popover-menu-separator></li>
+        <li><a href="#">Green</a></li>
+        <li><a href="#">Blue</a></li>
+        <li sf-popover-menu-separator></li>
+    </ul>
+</div>
+<form class="demo__controls">
+    <label>Button caption: <input type="text" ng-model="demoCtrl.caption"></label>
+    <label><input type="checkbox" ng-model="demoCtrl.visible" ng-click="$event.stopPropagation();">Visible?</label>
+</form>
