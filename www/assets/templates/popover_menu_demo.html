@@ -1,5 +1,5 @@
-<div sf-popover-menu="{buttonAttachment: demoCtrl.buttonAttachment, popoverAttachment: demoCtrl.popoverAttachment}" class="demo__popover-menu"
-    ng-if="demoCtrl.visible">
+<div sf-popover-menu="{buttonAttachment: demoCtrl.buttonAttachment, popoverAttachment: demoCtrl.popoverAttachment}" sf-popover-menu-open="demoCtrl.open"
+    class="demo__popover-menu" ng-if="demoCtrl.visible">
     <button>{{demoCtrl.caption}}</button>
     <ul>
         <li sf-popover-menu-separator></li>
@@ -15,7 +15,10 @@
 </div>
 <form class="demo__controls">
     <p><label>Button caption: <input type="text" ng-model="demoCtrl.caption"></label></p>
-    <p><label><input type="checkbox" ng-model="demoCtrl.visible" ng-click="$event.stopPropagation();">Visible?</label></p>
+    <p>
+        <label><input type="checkbox" ng-model="demoCtrl.visible" ng-click="$event.stopPropagation();">Visible?</label>
+        <label><input type="checkbox" ng-model="demoCtrl.open" ng-click="$event.stopPropagation();">Open?</label>
+    </p>
     <p>
         <label>
             <span>Button attachment:</span>

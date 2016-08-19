@@ -6,6 +6,7 @@ function popoverMenuDirective($document: ng.IDocumentService): ng.IDirective {
     return {
         bindToController: {
             config: '<sfPopoverMenu',
+            isOpen: '=?sfPopoverMenuOpen',
         },
         controller: PopoverMenuController,
         controllerAs: 'popoverMenuCtrl',
@@ -67,6 +68,7 @@ class PopoverMenuController implements ng.IComponentController, IPopoverMenuCont
             .attr('aria-haspopup', 'true')
             .on('click', () => {
                 this.isOpen = !this.isOpen;
+                this.scope.$apply();
             })
             .on('keydown', this.keyDownHandler)
             .appendTo(element);
@@ -74,7 +76,7 @@ class PopoverMenuController implements ng.IComponentController, IPopoverMenuCont
         buttonElement.id = id + '__button';
         buttonElement.type = 'button';
 
-        this.setPopoverState(false);
+        this.applyPopoverState();
     }
 
     public $onDestroy(): void {
@@ -82,22 +84,88 @@ class PopoverMenuController implements ng.IComponentController, IPopoverMenuCont
     }
 
     public get isOpen(): boolean {
-        return !!this.list;
+        return this._isOpen;
     }
 
     public set isOpen(value: boolean) {
-        if (value) {
-            this.open();
-        } else {
-            this.close();
+        value = !!value;
+
+        if (value !== this._isOpen) {
+            this._isOpen = value;
+
+            if (this.button) {
+                this.applyPopoverState();
+            }
         }
     }
 
     public close(): void {
-        if (!this.list) {
+        this.isOpen = false;
+    }
+
+    public open(): void {
+        this.isOpen = true;
+    }
+
+    /* Properties */
+    /* ---------- */
+
+    private _isOpen: boolean;
+
+    private button: JQuery;
+    private list: JQuery;
+    private tether: Tether;
+
+    private documentClickHandler = (e: JQueryEventObject): void => {
+        if (!(e.isDefaultPrevented() || this.element[0].contains(e.target))) {
+            this.close();
+            this.scope.$apply();
+        }
+    };
+
+    private keyDownHandler = (e: JQueryKeyEventObject): void => {
+        if (e.isDefaultPrevented()) {
             return;
         }
 
+        switch (e.key) {
+            case 'Escape':
+                this.button.trigger('focus');
+                this.close();
+                this.scope.$apply();
+                break;
+            case 'ArrowUp':
+                this.shiftFocus(e.target, -1);
+                break;
+            case 'ArrowDown':
+                this.shiftFocus(e.target, 1);
+                break;
+            default:
+                return;
+        }
+
+        e.preventDefault();
+    };
+
+    /* Methods */
+    /* ------- */
+
+    private applyPopoverState(): void {
+        const isOpen = this._isOpen;
+
+        if (isOpen) {
+            if (!this.list) {
+                this.openPopover();
+            }
+        } else if (this.list) {
+            this.closePopover();
+        }
+
+        this.element.toggleClass('popover-menu--open', isOpen);
+        this.button.attr('aria-expanded', isOpen ? 'true' : 'false');
+    }
+
+    private closePopover(): void {
         this.document.off('click', this.documentClickHandler);
 
         this.tether.destroy();
@@ -105,15 +173,9 @@ class PopoverMenuController implements ng.IComponentController, IPopoverMenuCont
 
         this.list.remove();
         this.list = null;
-
-        this.setPopoverState(false);
     }
 
-    public open(): void {
-        if (this.list) {
-            return;
-        }
-
+    private openPopover(): void {
         this.list = (<JQuery>(<any>this.transclude)(this.scope, null, null, 'list'))
             .addClass('popover-menu__list')
             .attr('aria-labelledby', this.button[0].id)
@@ -132,52 +194,6 @@ class PopoverMenuController implements ng.IComponentController, IPopoverMenuCont
         });
 
         this.document.on('click', this.documentClickHandler);
-
-        this.setPopoverState(true);
-    }
-
-    /* Properties */
-    /* ---------- */
-
-    private button: JQuery;
-    private list: JQuery;
-    private tether: Tether;
-
-    private documentClickHandler = (e: JQueryEventObject): void => {
-        if (!(e.isDefaultPrevented() || this.element[0].contains(e.target))) {
-            this.close();
-        }
-    };
-
-    private keyDownHandler = (e: JQueryKeyEventObject): void => {
-        if (e.isDefaultPrevented()) {
-            return;
-        }
-
-        switch (e.key) {
-            case 'Escape':
-                this.button.trigger('focus');
-                this.close();
-                break;
-            case 'ArrowUp':
-                this.shiftFocus(e.target, -1);
-                break;
-            case 'ArrowDown':
-                this.shiftFocus(e.target, 1);
-                break;
-            default:
-                return;
-        }
-
-        e.preventDefault();
-    };
-
-    /* Methods */
-    /* ------- */
-
-    private setPopoverState(isOpen: boolean): void {
-        this.element.toggleClass('popover-menu--open', isOpen);
-        this.button.attr('aria-expanded', isOpen ? 'true' : 'false');
     }
 
     private shiftFocus(startingElement: Element, positions: number): void {
