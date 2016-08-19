@@ -1,6 +1,6 @@
-<div sf-popover-menu="{buttonAttachment: demoCtrl.buttonAttachment, popoverAttachment: demoCtrl.popoverAttachment}" sf-popover-menu-open="demoCtrl.open"
+<button sf-popover-menu="{buttonAttachment: demoCtrl.buttonAttachment, popoverAttachment: demoCtrl.popoverAttachment}" sf-popover-menu-open="demoCtrl.open"
     class="demo__popover-menu" ng-if="demoCtrl.visible">
-    <button>{{demoCtrl.caption}}</button>
+    <span>{{demoCtrl.caption}}</span>
     <ul>
         <li sf-popover-menu-separator></li>
         <li><a href="#">Red</a></li>
@@ -12,7 +12,7 @@
         <li><a href="#">Blue</a></li>
         <li sf-popover-menu-separator></li>
     </ul>
-</div>
+</button>
 <form class="demo__controls">
     <p><label>Button caption: <input type="text" ng-model="demoCtrl.caption"></label></p>
     <p>

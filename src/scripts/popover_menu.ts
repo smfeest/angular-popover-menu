@@ -12,7 +12,6 @@ function popoverMenuDirective($document: ng.IDocumentService): ng.IDirective {
         controllerAs: 'popoverMenuCtrl',
         scope: true,
         transclude: {
-            button: 'button',
             list: 'ul',
         },
     };
@@ -57,26 +56,25 @@ class PopoverMenuController implements ng.IComponentController, IPopoverMenuCont
     /* ------- */
 
     public $postLink(): void {
-        const element = this.element;
-
-        const id = element[0].id = (element[0].id ||
-            ('popover-menu-' + PopoverMenuController.counter++));
-
-        element.addClass('popover-menu');
-
-        const button = this.button = (<JQuery>(<any>this.transclude)(this.scope, null, null, 'button'))
+        const buttonElement = this.element
+            .append(this.transclude())
             .attr('aria-haspopup', 'true')
             .on('click', () => {
                 this.isOpen = !this.isOpen;
                 this.scope.$apply();
             })
-            .on('keydown', this.keyDownHandler)
-            .appendTo(element);
-        const buttonElement = <HTMLButtonElement>button[0];
-        buttonElement.id = id + '__button';
-        buttonElement.type = 'button';
+            .on('keydown', this.keyDownHandler)[0];
+
+        buttonElement.id = (buttonElement.id ||
+            ('popover-menu-button-' + PopoverMenuController.counter++));
+
+        if (buttonElement instanceof HTMLButtonElement) {
+            buttonElement.type = 'button';
+        }
 
         this.applyPopoverState();
+
+        this.linked = true;
     }
 
     public $onDestroy(): void {
@@ -93,7 +91,7 @@ class PopoverMenuController implements ng.IComponentController, IPopoverMenuCont
         if (value !== this._isOpen) {
             this._isOpen = value;
 
-            if (this.button) {
+            if (this.linked) {
                 this.applyPopoverState();
             }
         }
@@ -111,13 +109,12 @@ class PopoverMenuController implements ng.IComponentController, IPopoverMenuCont
     /* ---------- */
 
     private _isOpen: boolean;
-
-    private button: JQuery;
+    private linked: boolean;
     private list: JQuery;
     private tether: Tether;
 
     private documentClickHandler = (e: JQueryEventObject): void => {
-        if (!e.isDefaultPrevented() && this.list && !this.button[0].contains(e.target) &&
+        if (!e.isDefaultPrevented() && this.list && !this.element[0].contains(e.target) &&
             (jQuery(e.target).is('li > a') || !this.list[0].contains(e.target))) {
             this.close();
             this.scope.$apply();
@@ -131,7 +128,7 @@ class PopoverMenuController implements ng.IComponentController, IPopoverMenuCont
 
         switch (e.key) {
             case 'Escape':
-                this.button.trigger('focus');
+                this.element.trigger('focus');
                 this.close();
                 this.scope.$apply();
                 break;
@@ -162,8 +159,7 @@ class PopoverMenuController implements ng.IComponentController, IPopoverMenuCont
             this.closePopover();
         }
 
-        this.element.toggleClass('popover-menu--open', isOpen);
-        this.button.attr('aria-expanded', isOpen ? 'true' : 'false');
+        this.element.attr('aria-expanded', isOpen ? 'true' : 'false');
     }
 
     private closePopover(): void {
@@ -178,15 +174,15 @@ class PopoverMenuController implements ng.IComponentController, IPopoverMenuCont
 
     private openPopover(): void {
         this.list = (<JQuery>(<any>this.transclude)(this.scope, null, null, 'list'))
-            .addClass('popover-menu__list')
-            .attr('aria-labelledby', this.button[0].id)
+            .addClass('popover-menu')
+            .attr('aria-labelledby', this.element[0].id)
             .on('keydown', this.keyDownHandler)
             .appendTo(this.document[0].body);
 
         this.tether = new Tether({
             element: this.list,
             attachment: (this.config && this.config.popoverAttachment) || 'top left',
-            target: this.button,
+            target: this.element,
             targetAttachment: (this.config && this.config.buttonAttachment) || 'bottom left',
             constraints: [{
                 to: 'window',
