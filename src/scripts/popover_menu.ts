@@ -2,6 +2,74 @@ angular.module('sfPopoverMenu', [])
     .directive('sfPopoverMenu', popoverMenuDirective)
     .directive('sfPopoverMenuSeparator', popoverMenuSeparatorDirective);
 
+/**
+ * Defines the `sf-popover-menu` directive.
+ *
+ * This directive is used to add a popover menu to a button.
+ *
+ * BASIC USAGE
+ *
+ * To create a basic popover menu, add the `sf-popover-menu` attribute to a `<button>` element.
+ *
+ * The `<button>` element must have a child `<ul>` element containing a list of menu items.
+ *
+ * ```html
+ * <button sf-popover-menu>
+ *   <span>Open</span>
+ *   <ul>
+ *     <li><a href="/foo">Foo</a></li>
+ *     <li><a href="/bar">Bar</a></li>
+ *     <!-- ... -->
+ *   </ul>
+ * </button>
+ * ```
+ *
+ * POSITIONING
+ *
+ * By default, if there's enough space, the popover opens below the button, with the button and
+ * popover aligned along their left edges. This positioning can be overridden through the
+ * `sf-popover-menu` attribute.
+ *
+ * The individual properties in this configuration object are documented through
+ * `IPopoverMenuConfig`.
+ *
+ * ```html
+ * <button sf-popover-menu="{buttonAttachment: 'bottom right', popoverAttachment: 'bottom left'}">
+ *   <!-- ... -->
+ * </button>
+ * ```
+ *
+ * OPENING AND CLOSING
+ *
+ * The popover can be opened and closed by external components through the optional two-way bound
+ * `sf-popover-menu-open` attribute.
+ *
+ * ```html
+ * <button sf-popover-menu sf-popover-menu-open="fooCtrl.barIsOpen">
+ *   <!-- ... -->
+ * </button>
+ * ```
+ *
+ * SEPARATORS
+ *
+ * The `sf-popover-menu-separator` directive can be used to add separators between menu items.
+ *
+ * ```html
+ * <button sf-popover-menu>
+ *   <span>Open</span>
+ *   <ul>
+ *     <!-- ... -->
+ *     <li><a href="/foo">Foo</a></li>
+ *     <li sf-popover-menu-separator></li>
+ *     <li><a href="/bar">Bar</a></li>
+ *     <!-- ... -->
+ *   </ul>
+ * </button>
+ * ```
+ *
+ * Alternatively the popover menu controller (`IPopoverMenuController`) can be used by child
+ * components and directives to open and close the popover directly.
+ */
 function popoverMenuDirective($document: ng.IDocumentService): ng.IDirective {
     return {
         bindToController: {
@@ -17,6 +85,17 @@ function popoverMenuDirective($document: ng.IDocumentService): ng.IDirective {
     };
 }
 
+/**
+ * Defines the `sf-popover-menu-separator` directive.
+ *
+ * This directive is used to mark a `<li>` element in a popover menu as a separator.
+ *
+ * USAGE
+ *
+ * ```html
+ * <li sf-popover-menu-separator></li>
+ * ```
+ */
 function popoverMenuSeparatorDirective(): ng.IDirective {
     return {
         link: (scope, element) => {
