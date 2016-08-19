@@ -4,7 +4,12 @@ angular.module('sfPopoverMenu', [])
 
 function popoverMenuDirective($document: ng.IDocumentService): ng.IDirective {
     return {
+        bindToController: {
+            config: '<sfPopoverMenu',
+        },
         controller: PopoverMenuController,
+        controllerAs: 'popoverMenuCtrl',
+        scope: true,
         transclude: {
             button: 'button',
             list: 'ul',
@@ -42,13 +47,16 @@ class PopoverMenuController implements ng.IComponentController, IPopoverMenuCont
     /* PUBLIC */
     /* ====== */
 
+    /* Properties */
+    /* ---------- */
+
+    public config: IPopoverMenuConfig;
+
     /* Methods */
     /* ------- */
 
     public $postLink(): void {
         const element = this.element;
-
-        this.config = this.attrs['sfPopoverMenu'] && this.scope.$eval(this.attrs['sfPopoverMenu']);
 
         const id = element[0].id = (element[0].id ||
             ('popover-menu-' + PopoverMenuController.counter++));
@@ -132,7 +140,6 @@ class PopoverMenuController implements ng.IComponentController, IPopoverMenuCont
     /* ---------- */
 
     private button: JQuery;
-    private config: IPopoverMenuConfig;
     private list: JQuery;
     private tether: Tether;
 
@@ -214,6 +221,7 @@ interface IPopoverMenuController {
     open(): void;
 }
 
+/** Represents the configuration of a popover menu. */
 interface IPopoverMenuConfig {
     /**
      * The button's attachment point
