@@ -78,8 +78,8 @@ function createBundler() {
 
 function bundleScripts(bundler) {
     return bundler
-        .on('error', gulpUtil.log.bind(gulpUtil, 'Browserify Error'))
         .bundle()
+        .on('error', gulpUtil.log.bind(gulpUtil, 'Browserify Error'))
         .pipe(source('app.js'))
         .pipe(gulp.dest(config.jsPath));
 }
